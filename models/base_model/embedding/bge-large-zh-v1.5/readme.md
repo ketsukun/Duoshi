@@ -1,0 +1,1 @@
+需要下载bge-large-zh-v1.5，可使用scripts中的脚本下载
