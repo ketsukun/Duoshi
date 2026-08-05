@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="基于本地模型与诗例索引的古典诗词典故解析工具">
+  <title>多识 · 典故解析</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <div class="brand-mark" aria-hidden="true">识</div>
+        <div>
+          <div class="brand-name">多识</div>
+          <div class="brand-subtitle">古典诗词典故解析</div>
+        </div>
+        <button class="icon-button sidebar-close" id="sidebarClose" type="button" aria-label="关闭侧栏">×</button>
+      </div>
+
+      <button class="new-chat-button" id="newChatButton" type="button">
+        <span aria-hidden="true">＋</span>
+        新对话
+      </button>
+
+      <button class="knowledge-button" id="knowledgeButton" type="button">
+        <span aria-hidden="true">＋</span>
+        扩充知识库
+      </button>
+
+      <div class="sidebar-section">
+        <div class="section-label">试一试</div>
+        <button class="prompt-example" type="button" data-prompt="陈王昔时宴平乐，斗酒十千恣欢谑。使用了什么典故">
+          陈王昔时宴平乐，斗酒十千恣欢谑。
+        </button>
+        <button class="prompt-example" type="button" data-prompt="我非云梦才，邾莒困偏陋。使用了什么典故">
+          我非云梦才，邾莒困偏陋。
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="local-note">
+        </div>
+        <button class="theme-button" id="themeButton" type="button" aria-label="切换明暗主题">
+          <span id="themeIcon" aria-hidden="true">☾</span>
+          <span id="themeLabel">深色模式</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menuButton" type="button" aria-label="打开侧栏">☰</button>
+        <div class="topbar-title">典故解析</div>
+        <div class="model-badge" id="modelBadge">
+          <span class="model-dot"></span>
+          <span id="modelLabel">正在连接…</span>
+        </div>
+      </header>
+
+      <section class="conversation" id="conversation" aria-live="polite">
+        <div class="welcome" id="welcome">
+          <div class="welcome-seal" aria-hidden="true">识</div>
+          <h1>从一句诗，寻一段旧事</h1>
+          <p>输入诗句，我将解析诗中可能使用的典故</p>
+          <div class="suggestion-grid">
+            <button class="suggestion-card" type="button" data-prompt="陈王昔时宴平乐，斗酒十千恣欢谑。使用了什么典故">
+              <span class="suggestion-title">平乐之宴</span>
+              <span>陈王昔时宴平乐，斗酒十千恣欢谑。</span>
+            </button>
+            <button class="suggestion-card" type="button" data-prompt="我非云梦才，邾莒困偏陋。使用了什么典故">
+              <span class="suggestion-title">云梦之才</span>
+              <span>我非云梦才，邾莒困偏陋。</span>
+            </button>
+          </div>
+        </div>
+        <div class="messages" id="messages"></div>
+      </section>
+
+      <div class="composer-area">
+        <form class="composer" id="chatForm">
+          <textarea
+            id="messageInput"
+            rows="1"
+            maxlength="4000"
+            placeholder="输入需要解析的诗句…"
+            aria-label="诗句输入"
+          ></textarea>
+          <button class="send-button" id="sendButton" type="submit" aria-label="发送">
+            <span id="sendIcon" aria-hidden="true">↑</span>
+          </button>
+        </form>
+        <div class="composer-hint">厦门大学马来西亚分校王治田副教授与西南交通大学张杰博士共同开发。</div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="knowledgeModal" hidden>
+    <section class="knowledge-modal" role="dialog" aria-modal="true" aria-labelledby="knowledgeTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="knowledgeTitle">扩充典故知识库</h2>
+        </div>
+        <button class="icon-button" id="knowledgeClose" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <form id="knowledgeForm">
+        <div class="form-grid">
+          <label class="field full-width">
+            <span>典故名称 <b>*</b></span>
+            <input name="allusion_name" maxlength="200" required placeholder="例如：陈王宴平乐">
+          </label>
+          <label class="field full-width">
+            <span>典故原文 <b>*</b></span>
+            <textarea name="source_text" rows="4" maxlength="10000" required placeholder="填写典故出处原文"></textarea>
+          </label>
+          <label class="field full-width">
+            <span>典故释义 <b>*</b></span>
+            <textarea name="allusion_mean" rows="3" maxlength="10000" required placeholder="说明典故的含义与常见用法"></textarea>
+          </label>
+          <label class="field">
+            <span>语义标签</span>
+            <input name="semantic_tags" maxlength="2000" placeholder="多个标签可用逗号分隔">
+          </label>
+          <label class="field">
+            <span>典故异名</span>
+            <input name="allusion_variants" maxlength="2000" placeholder="多个异名可用逗号分隔">
+          </label>
+          <label class="field full-width">
+            <span>诗例 <b>*</b></span>
+            <textarea name="poem_example" rows="3" maxlength="10000" required placeholder="填写使用该典故的诗句；多个诗例可分行填写"></textarea>
+          </label>
+        </div>
+        <div class="form-message" id="knowledgeMessage" role="status"></div>
+        <div class="modal-actions">
+          <button class="secondary-button" id="knowledgeCancel" type="button">取消</button>
+          <button class="primary-button" id="knowledgeSubmit" type="submit">保存到知识库</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
